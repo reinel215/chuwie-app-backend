@@ -13,13 +13,23 @@ const usersApi = (app) => {
     router.post('/register', async (req, res, next) => {
 
         try {
-            const user = {
-                email : req.body.email,
+            const user = { //register in the auth of firebase
+                email: req.body.email,
                 password: req.body.password,
             }
             const userResponse = await createUserAuth(user);
+
+            const userRegister = { //register in the collection of user informatcion
+                uid: userResponse.uid,
+                email: req.body.email,
+                name: req.body.name,
+                lastName: req.body.lastName,
+                country: req.body.country,
+                docNumber: req.body.docNumber,
+                role: req.body.role
+            }
             try {
-                await createUserDoc({ email: req.body.email, name: req.body.name, uid: userResponse.uid });
+                await createUserDoc(userRegister);
             } catch (error) {
                 admin.auth().deleteUser(userResponse.uid);
                 next(error);
@@ -35,7 +45,7 @@ const usersApi = (app) => {
 
 
 
-    router.post('/forgot-password', async (req,res, next) => {
+    router.post('/forgot-password', async (req, res, next) => {
         try {
             await forgotPassword({ email: req.body.email });
             res.status(200).json({ message: "ok" })
@@ -46,7 +56,7 @@ const usersApi = (app) => {
     })
 
 
-    router.get('/currentUser', isAuth ,async (req,res,next) => {
+    router.get('/currentUser', isAuth, async (req, res, next) => {
         try {
             const user = await getCurrentUserInfo({ tokenId: req.headers.authorization });
             res.status(200).json(user);
