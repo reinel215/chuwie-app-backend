@@ -17,13 +17,14 @@ const usersApi = (app) => {
                 email: req.body.email,
                 password: req.body.password,
             }
+
             const userResponse = await createUserAuth(user);
 
             const userRegister = { //register in the collection of user informatcion
                 uid: userResponse.uid,
                 email: req.body.email,
                 name: req.body.name,
-                lastName: req.body.lastName,
+                lastname: req.body.lastname,
                 country: req.body.country,
                 docNumber: req.body.docNumber,
                 role: req.body.role
@@ -38,7 +39,14 @@ const usersApi = (app) => {
 
             res.status(201).json(userResponse)
         } catch (error) {
-            next(error);
+            let errorResponse = {
+                message: "Error en registar usuario",
+                status: 401
+            }
+            if (error.code === "auth/email-already-exists") {
+                errorResponse.message = "El email indicado ya se encuentra en uso."
+            }
+            next(errorResponse);
         }
 
     })
