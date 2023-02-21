@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 //CORS
 const cors = require('cors');
-app.use(cors()); //activa el cors para todas las rutas
+app.use(cors({})); //activa el cors para todas las rutas
 
 
 //PROTECCION DE CABEZERAS

@@ -6,7 +6,8 @@ const isAuth = (req, res, next) => {
         return res.status(403).json({ error: 'No credentials sent!' });
     }
 
-    admin.auth().verifyIdToken(req.headers.authorization)
+    const token = req.headers.authorization;
+    admin.auth().verifyIdToken(token)
         .then((decodedToken) => {
             next()
         }).catch(() => {
