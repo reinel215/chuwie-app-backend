@@ -5,6 +5,7 @@ const createUserAuth = require('../../services/user/createUserAuth');
 const forgotPassword = require('../../services/user/forgotPassword');
 const isAuth = require('../../utils/middlewares/auth/isAuth');
 const getCurrentUserInfo = require('../../services/user/getCurrentUserInfo');
+const updateUser = require('../../services/user/updateUser');
 
 const usersApi = (app) => {
 
@@ -67,6 +68,16 @@ const usersApi = (app) => {
     router.get('/currentUser', isAuth, async (req, res, next) => {
         try {
             const user = await getCurrentUserInfo({ tokenId: req.headers.authorization });
+            res.status(200).json(user);
+        } catch (error) {
+            next(error)
+        }
+    })
+
+
+    router.put("/", isAuth ,async (req, res, next) => {
+        try {
+            const user = await updateUser({ userId: req.userId, updateValues: req.body });
             res.status(200).json(user);
         } catch (error) {
             next(error)

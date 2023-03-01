@@ -4,7 +4,6 @@ const db = require('../../config/firebase/db')
 const getCurrentUserInfo = async ({ tokenId }) => {
     const decodedToken = await admin.auth().verifyIdToken(tokenId)
     const uid = decodedToken.uid;
-    //aqui falta obtener la data de la coleccion
     const userDb = db.collection("users");
     const userDoc = userDb.doc(uid);
     const userInfo = await userDoc.get();

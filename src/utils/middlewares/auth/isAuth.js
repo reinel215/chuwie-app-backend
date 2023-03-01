@@ -9,6 +9,7 @@ const isAuth = (req, res, next) => {
     const token = req.headers.authorization;
     admin.auth().verifyIdToken(token)
         .then((decodedToken) => {
+            req.userId = decodedToken.uid;
             next()
         }).catch(() => {
             res.status(403).json({ error: 'Unathorized' });
