@@ -67,7 +67,7 @@ const usersApi = (app) => {
 
     router.get('/currentUser', isAuth, async (req, res, next) => {
         try {
-            const user = await getCurrentUserInfo({ tokenId: req.headers.authorization });
+            const user = await getCurrentUserInfo({ userId: req.userId });
             res.status(200).json(user);
         } catch (error) {
             next(error)
