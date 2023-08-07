@@ -4,8 +4,11 @@ const createUserDoc = require("../../services/user/createUserDoc");
 const createUserAuth = require("../../services/user/createUserAuth");
 const forgotPassword = require("../../services/user/forgotPassword");
 const isAuth = require("../../utils/middlewares/auth/isAuth");
-const getCurrentUserInfo = require("../../services/user/getCurrentUserInfo");
+const getUserInfo = require("../../services/user/getUserInfo");
 const updateUser = require("../../services/user/updateUser");
+const deleteUser = require("../../services/user/deleteUser");
+const rolFilter = require("../../utils/middlewares/rolFilter");
+const getUsers = require("../../services/user/getUsers");
 
 const usersApi = (app) => {
   app.use("/api/users", router);
@@ -29,6 +32,7 @@ const usersApi = (app) => {
         country: req.body.country,
         docNumber: req.body.docNumber,
         role: req.body.role,
+        enabled: true,
       };
       try {
         await createUserDoc(userRegister);
@@ -62,6 +66,7 @@ const usersApi = (app) => {
         country: req.body.country,
         docNumber: req.body.docNumber,
         role: req.body.role,
+        enabled: req.body.enabled || true,
       };
       await createUserDoc(userRegister);
       res.status(201).json(userResponse);
@@ -81,7 +86,7 @@ const usersApi = (app) => {
 
   router.get("/currentUser", isAuth, async (req, res, next) => {
     try {
-      const user = await getCurrentUserInfo({ userId: req.userId });
+      const user = await getUserInfo({ userId: req.userId });
       res.status(200).json(user);
     } catch (error) {
       next(error);
@@ -99,6 +104,52 @@ const usersApi = (app) => {
       next(error);
     }
   });
+
+  router.delete(
+    "/:id",
+    isAuth,
+    rolFilter({ allowedRoles: ["super_admin"] }),
+    async (req, res, next) => {
+      const userId = req.params.id;
+      console.log("ESTE ES EL USERID ", userId);
+      try {
+        await deleteUser({ userId });
+        res.status(200).json();
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+
+  router.get(
+    "/",
+    isAuth,
+    rolFilter({ allowedRoles: ["super_admin"] }),
+    async (req, res, next) => {
+      try {
+        const users = await getUsers();
+        res.status(200).json(users);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+
+  router.get(
+    "/:userId",
+    isAuth,
+    rolFilter({ allowedRoles: ["super_admin"] }),
+    async (req, res, next) => {
+      try {
+        const userId = req.params.userId;
+        console.log("EN GET ", userId);
+        const user = await getUserInfo({ userId });
+        res.status(200).json(user);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 };
 
 module.exports = {
