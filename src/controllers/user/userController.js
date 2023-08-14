@@ -150,6 +150,24 @@ const usersApi = (app) => {
       }
     }
   );
+
+  router.put(
+    "/:userId",
+    isAuth,
+    rolFilter({ allowedRoles: ["super_admin"] }),
+    async (req, res, next) => {
+      try {
+        const userId = req.params.userId;
+        const user = await updateUser({
+          userId: userId,
+          updateValues: req.body,
+        });
+        res.status(200).json(user);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 };
 
 module.exports = {
